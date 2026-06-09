@@ -1,4 +1,4 @@
-import { AttendanceLog, OrganizationSettings, PayrollMode, User } from "./types";
+import { AttendanceFlag, AttendanceLog, OrganizationSettings, PayrollMode, User } from "./types";
 import { dayNameFromIsoDate, toMinutes } from "./timezone";
 
 const MONTHLY_HOURS_BASE = 160;
@@ -99,7 +99,7 @@ export const isWithinRange = (date: string, start: string, end: string): boolean
   return date >= start && date <= end;
 };
 
-export const outsideShiftFlag = (flags: string[]): string[] => {
+export const outsideShiftFlag = (flags: AttendanceFlag[]): AttendanceFlag[] => {
   if (flags.includes("Outside Shift Hours")) {
     return flags;
   }

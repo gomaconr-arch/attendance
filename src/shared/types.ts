@@ -2,6 +2,8 @@ export type SubscriptionStatus = "enabled" | "disabled";
 export type Role = "SuperAdmin" | "Employer" | "Employee";
 export type CompensationType = "hourly" | "monthly";
 export type PayrollMode = "hourly" | "monthly";
+export type AttendanceFlag = "Outside Shift Hours" | "ADMIN_OVERWRITE" | "LATE_ENTRY" | "VOIDED";
+export type CorrectionRequestStatus = "pending" | "approved" | "rejected";
 export type WorkDayName =
   | "Monday"
   | "Tuesday"
@@ -53,7 +55,43 @@ export interface AttendanceLog {
   clock_in: string;
   clock_out: string | null;
   total_hours: number | null;
-  flags: string[];
+  flags: AttendanceFlag[];
+  is_modified: boolean;
+  is_voided: boolean;
+}
+
+export interface AttendanceAdjustment {
+  adjustment_id: string;
+  org_id: string;
+  log_id: string;
+  modified_by_user_id: string;
+  timestamp: string;
+  previous_values: {
+    clock_in: string;
+    clock_out: string | null;
+    is_voided: boolean;
+  };
+  new_values: {
+    clock_in: string;
+    clock_out: string | null;
+    is_voided: boolean;
+  };
+  reason: string;
+}
+
+export interface CorrectionRequest {
+  request_id: string;
+  org_id: string;
+  employee_id: string;
+  target_date: string;
+  requested_clock_in: string;
+  requested_clock_out: string;
+  employee_note: string;
+  status: CorrectionRequestStatus;
+  reviewer_note: string | null;
+  reviewed_by_user_id: string | null;
+  reviewed_at: string | null;
+  created_at: string;
 }
 
 export interface Session {
@@ -68,6 +106,8 @@ export interface SeedData {
   organizations: Organization[];
   users: User[];
   attendance_logs: AttendanceLog[];
+  attendance_adjustments: AttendanceAdjustment[];
+  correction_requests: CorrectionRequest[];
 }
 
 export interface DateRange {

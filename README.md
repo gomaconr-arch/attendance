@@ -32,6 +32,7 @@ Modular React + TypeScript multi-tenant attendance and payroll drafting app, rea
 Migrations are located in `migrations/`:
 - `0001_init.sql` creates schema
 - `0002_seed.sql` seeds initial data
+- `0003_attendance_controls.sql` adds immutable attendance adjustment ledger, correction request workflow tables, and log mutation metadata columns
 
 ## Deploy to Cloudflare Pages
 

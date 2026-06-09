@@ -72,7 +72,47 @@ const mapLog = (row: any) => ({
   clock_in: row.clock_in,
   clock_out: row.clock_out,
   total_hours: row.total_hours === null ? null : Number(row.total_hours),
-  flags: parseJsonArray<string>(row.flags_json, [])
+  flags: parseJsonArray<string>(row.flags_json, []),
+  is_modified: Number(row.is_modified ?? 0) === 1,
+  is_voided: Number(row.is_voided ?? 0) === 1
+});
+
+const mapAdjustment = (row: any) => ({
+  adjustment_id: row.adjustment_id,
+  org_id: row.org_id,
+  log_id: row.log_id,
+  modified_by_user_id: row.modified_by_user_id,
+  timestamp: row.timestamp,
+  previous_values: (() => {
+    try {
+      return JSON.parse(row.previous_values_json ?? "{}");
+    } catch {
+      return {};
+    }
+  })(),
+  new_values: (() => {
+    try {
+      return JSON.parse(row.new_values_json ?? "{}");
+    } catch {
+      return {};
+    }
+  })(),
+  reason: row.reason
+});
+
+const mapCorrectionRequest = (row: any) => ({
+  request_id: row.request_id,
+  org_id: row.org_id,
+  employee_id: row.employee_id,
+  target_date: row.target_date,
+  requested_clock_in: row.requested_clock_in,
+  requested_clock_out: row.requested_clock_out,
+  employee_note: row.employee_note,
+  status: row.status,
+  reviewer_note: row.reviewer_note,
+  reviewed_by_user_id: row.reviewed_by_user_id,
+  reviewed_at: row.reviewed_at,
+  created_at: row.created_at
 });
 
 export const getScopedState = async (db: Db, actor: Actor) => {
@@ -80,11 +120,15 @@ export const getScopedState = async (db: Db, actor: Actor) => {
     const orgRows = await db.prepare("SELECT * FROM organizations ORDER BY created_at DESC").all<any>();
     const userRows = await db.prepare("SELECT * FROM users ORDER BY created_at DESC").all<any>();
     const logRows = await db.prepare("SELECT * FROM attendance_logs ORDER BY date DESC").all<any>();
+    const adjustmentRows = await db.prepare("SELECT * FROM attendance_adjustments ORDER BY timestamp DESC").all<any>();
+    const correctionRows = await db.prepare("SELECT * FROM correction_requests ORDER BY created_at DESC").all<any>();
 
     return {
       organizations: (orgRows.results ?? []).map(mapOrganization),
       users: (userRows.results ?? []).map(mapUser),
-      attendance_logs: (logRows.results ?? []).map(mapLog)
+      attendance_logs: (logRows.results ?? []).map(mapLog),
+      attendance_adjustments: (adjustmentRows.results ?? []).map(mapAdjustment),
+      correction_requests: (correctionRows.results ?? []).map(mapCorrectionRequest)
     };
   }
 
@@ -95,11 +139,21 @@ export const getScopedState = async (db: Db, actor: Actor) => {
   const orgRows = await db.prepare("SELECT * FROM organizations WHERE org_id = ?").bind(actor.org_id).all<any>();
   const userRows = await db.prepare("SELECT * FROM users WHERE org_id = ? ORDER BY created_at DESC").bind(actor.org_id).all<any>();
   const logRows = await db.prepare("SELECT * FROM attendance_logs WHERE org_id = ? ORDER BY date DESC").bind(actor.org_id).all<any>();
+  const adjustmentRows = await db
+    .prepare("SELECT * FROM attendance_adjustments WHERE org_id = ? ORDER BY timestamp DESC")
+    .bind(actor.org_id)
+    .all<any>();
+  const correctionRows = await db
+    .prepare("SELECT * FROM correction_requests WHERE org_id = ? ORDER BY created_at DESC")
+    .bind(actor.org_id)
+    .all<any>();
 
   return {
     organizations: (orgRows.results ?? []).map(mapOrganization),
     users: (userRows.results ?? []).map(mapUser),
-    attendance_logs: (logRows.results ?? []).map(mapLog)
+    attendance_logs: (logRows.results ?? []).map(mapLog),
+    attendance_adjustments: (adjustmentRows.results ?? []).map(mapAdjustment),
+    correction_requests: (correctionRows.results ?? []).map(mapCorrectionRequest)
   };
 };
 

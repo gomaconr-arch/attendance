@@ -1,9 +1,11 @@
-import { AttendanceLog, Organization, PayrollMode, User } from "./types";
+import { AttendanceAdjustment, AttendanceLog, CorrectionRequest, Organization, PayrollMode, User } from "./types";
 
 export interface ScopedState {
   organizations: Organization[];
   users: User[];
   attendance_logs: AttendanceLog[];
+  attendance_adjustments: AttendanceAdjustment[];
+  correction_requests: CorrectionRequest[];
 }
 
 interface LoginResponse {

@@ -1,5 +1,5 @@
 import { DEFAULT_ORGANIZATION_SETTINGS } from "./defaults";
-import { AttendanceLog, Organization, SeedData, User } from "./types";
+import { AttendanceAdjustment, AttendanceLog, AttendanceFlag, CorrectionRequest, Organization, SeedData, User } from "./types";
 import { hoursDiff } from "./payroll";
 
 const TODAY = "2026-06-09";
@@ -102,7 +102,7 @@ const buildLog = (
   date: string,
   clockIn: string,
   clockOut: string | null,
-  flags: string[] = []
+  flags: AttendanceFlag[] = []
 ): AttendanceLog => ({
   log_id: logId,
   org_id: orgId,
@@ -111,7 +111,9 @@ const buildLog = (
   clock_in: clockIn,
   clock_out: clockOut,
   total_hours: clockOut ? hoursDiff(clockIn, clockOut) : null,
-  flags
+  flags,
+  is_modified: false,
+  is_voided: false
 });
 
 const attendance_logs: AttendanceLog[] = [
@@ -131,8 +133,29 @@ const attendance_logs: AttendanceLog[] = [
   buildLog("LOG_6001", "ORG_PH_002", "USR_102", "2026-06-01", "09:00", "18:00")
 ];
 
+const attendance_adjustments: AttendanceAdjustment[] = [];
+
+const correction_requests: CorrectionRequest[] = [
+  {
+    request_id: "REQ_8801",
+    org_id: "ORG_PH_001",
+    employee_id: "USR_002",
+    target_date: "2026-06-09",
+    requested_clock_in: "08:00",
+    requested_clock_out: "17:00",
+    employee_note: "Forgot to punch in until late, then double tapped at 2 PM.",
+    status: "pending",
+    reviewer_note: null,
+    reviewed_by_user_id: null,
+    reviewed_at: null,
+    created_at: "2026-06-09T08:10:00Z"
+  }
+];
+
 export const seedData: SeedData = {
   organizations,
   users,
-  attendance_logs
+  attendance_logs,
+  attendance_adjustments,
+  correction_requests
 };
