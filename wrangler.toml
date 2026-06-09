@@ -1,0 +1,11 @@
+name = "attendance-payroll-saas"
+compatibility_date = "2026-06-09"
+
+[assets]
+directory = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "attendance-payroll-d1"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+migrations_dir = "migrations"

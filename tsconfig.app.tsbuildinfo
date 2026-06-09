@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/admin/superadminportal.tsx","./src/client/employeeconsoleview.tsx","./src/client/employerdashboardview.tsx","./src/client/mobileshell.tsx","./src/shared/api.ts","./src/shared/defaults.ts","./src/shared/format.ts","./src/shared/payroll.ts","./src/shared/seed.ts","./src/shared/timezone.ts","./src/shared/types.ts"],"version":"5.9.3"}
